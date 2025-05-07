@@ -1,0 +1,63 @@
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: smartreading-app
+    restart: unless-stopped
+    working_dir: /var/www/
+    volumes:
+      - ./:/var/www
+    networks:
+      - smartreading-network
+    depends_on:
+      - mysql
+      - redis
+
+  nginx:
+    image: nginx:alpine
+    container_name: smartreading-nginx
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+    volumes:
+      - ./:/var/www
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d/
+    networks:
+      - smartreading-network
+    depends_on:
+      - app
+
+  mysql:
+    image: mysql:8.0
+    container_name: smartreading-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE:-smartreading}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-root}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-root}
+      MYSQL_USER: ${DB_USERNAME:-smartreading}
+      SERVICE_TAGS: dev
+      SERVICE_NAME: mysql
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./docker/mysql:/var/lib/mysql
+    networks:
+      - smartreading-network
+
+  redis:
+    image: redis:alpine
+    container_name: smartreading-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./docker/redis:/data
+    networks:
+      - smartreading-network
+
+networks:
+  smartreading-network:
+    driver: bridge 
