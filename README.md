@@ -9,7 +9,7 @@
 
 1. Клонируйте репозиторий:
 ```bash
-git clone <repository-url>
+git clone https://github.com/alleksandrb/smartreading.git
 cd smartreading
 ```
 
@@ -68,7 +68,8 @@ Content-Type: application/json
     "title": "Название задачи",
     "description": "Описание задачи",
     "status": "new",
-    "due_date": "2026-03-20"
+    "due_date": "2026-03-20",
+    "user_id": 1
 }
 ```
 
@@ -93,8 +94,9 @@ Content-Type: application/json
 {
     "title": "Обновленное название",
     "description": "Обновленное описание",
-    "status": "new",
-    "due_date": "2026-03-21"
+    "status": "in_progress",
+    "due_date": "2026-03-21",
+    "user_id": 1
 }
 ```
 
