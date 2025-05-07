@@ -1,61 +1,138 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Smart Reading Application
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## Требования
+- Docker
+- Docker Compose
+- Make
 
-## About Laravel
+## Сборка и запуск приложения
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+1. Клонируйте репозиторий:
+```bash
+git clone <repository-url>
+cd smartreading
+```
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+2. Соберите и запустите контейнеры:
+```bash
+make build
+make up
+```
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+3. Установите зависимости:
+```bash
+make composer-install
+```
 
-## Learning Laravel
+4. Запустите миграции и сидеры базы данных:
+```bash
+make artisan-migrate
+make artisan-seed
+```
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Аутентификация
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+В приложении предустановлен тестовый пользователь:
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+```
+Email: test@example.com
+Пароль: password
+```
 
-## Laravel Sponsors
+Для входа используйте следующий эндпоинт:
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+```bash
+POST /api/login
+Content-Type: application/json
 
-### Premium Partners
+{
+    "email": "test@example.com",
+    "password": "password"
+}
+```
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development/)**
-- **[Active Logic](https://activelogic.com)**
+В ответе вы получите токен доступа, который нужно будет включать в заголовок Authorization для последующих запросов:
+```
+Authorization: Bearer <ваш_токен_доступа>
+```
 
-## Contributing
+## Эндпоинты управления задачами
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### Создание задачи
+```bash
+POST /api/tasks
+Authorization: Bearer <ваш_токен_доступа>
+Content-Type: application/json
 
-## Code of Conduct
+{
+    "title": "Название задачи",
+    "description": "Описание задачи",
+    "status": "new",
+    "due_date": "2026-03-20"
+}
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### Получение списка всех задач
+```bash
+GET /api/tasks
+Authorization: Bearer <ваш_токен_доступа>
+```
 
-## Security Vulnerabilities
+### Получение информации о задаче
+```bash
+GET /api/tasks/{id_задачи}
+Authorization: Bearer <ваш_токен_доступа>
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### Обновление задачи
+```bash
+PUT /api/tasks/{id_задачи}
+Authorization: Bearer <ваш_токен_доступа>
+Content-Type: application/json
 
-## License
+{
+    "title": "Обновленное название",
+    "description": "Обновленное описание",
+    "status": "new",
+    "due_date": "2026-03-21"
+}
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### Удаление задачи
+```bash
+DELETE /api/tasks/{id_задачи}
+Authorization: Bearer <ваш_токен_доступа>
+```
+
+## Часто используемые команды
+
+- Просмотр логов: `make logs`
+- Перезапуск контейнеров: `make restart`
+- Остановка контейнеров: `make down`
+- Доступ к оболочке контейнера: `make shell`
+- Очистка кэша: `make artisan-cache-clear`
+
+## Устранение неполадок
+
+Если возникли проблемы:
+
+1. Проверьте статус контейнеров:
+```bash
+make ps
+```
+
+2. Просмотрите логи приложения:
+```bash
+make logs
+```
+
+3. Очистите кэш Laravel:
+```bash
+make artisan-cache-clear
+```
+
+4. Перезапустите приложение:
+```bash
+make down
+make up
+```
