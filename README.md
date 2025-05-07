@@ -13,18 +13,28 @@ git clone https://github.com/alleksandrb/smartreading.git
 cd smartreading
 ```
 
-2. Соберите и запустите контейнеры:
+2. Скопируйте файл .env.example в .env:
+```bash
+cp .env.example .env
+```
+
+3. Сгенерируйте ключ приложения Laravel:
+```bash
+make artisan-key-generate
+```
+
+4. Соберите и запустите контейнеры:
 ```bash
 make build
 make up
 ```
 
-3. Установите зависимости:
+5. Установите зависимости:
 ```bash
 make composer-install
 ```
 
-4. Запустите миграции и сидеры базы данных:
+6. Запустите миграции и сидеры базы данных:
 ```bash
 make artisan-migrate
 make artisan-seed
@@ -75,7 +85,7 @@ Content-Type: application/json
 
 ### Получение списка всех задач
 ```bash
-GET /api/tasks
+GET /api/tasks?due_date=2026-03-20&status=new
 Authorization: Bearer <ваш_токен_доступа>
 ```
 
