@@ -48,22 +48,22 @@ class TaskRepository implements TaskRepositoryInterface
         $this->forgetFilteredCache();
     }
 
-    public function getFiltered(?string $status = null, ?string $dueDate = null): Collection
+    public function getFiltered(?string $status = null, ?string $dueDate = null, int $perPage = 15, int $page = 1): \Illuminate\Pagination\LengthAwarePaginator
     {
-        $cacheKey = $this->getFilteredCacheKey($status, $dueDate);
+        $cacheKey = $this->getFilteredCacheKey($status, $dueDate, $perPage, $page);
 
         return Cache::remember(
             $cacheKey,
             self::CACHE_TTL,
             fn () => Task::query()
-                ->when($status, function (Builder $query, string $status) {
+                ->when($status !== null, function (Builder $query) use ($status) {
                     $query->where('status', $status);
                 })
-                ->when($dueDate, function (Builder $query, string $dueDate) {
+                ->when($dueDate !== null, function (Builder $query) use ($dueDate) {
                     $query->whereDate('due_date', $dueDate);
                 })
                 ->with('user')
-                ->get()
+                ->paginate($perPage, ['*'], 'page', $page)
         );
     }
 
@@ -72,9 +72,9 @@ class TaskRepository implements TaskRepositoryInterface
         return self::CACHE_KEY_PREFIX . $id;
     }
 
-    private function getFilteredCacheKey(?string $status, ?string $dueDate): string
+    private function getFilteredCacheKey(?string $status, ?string $dueDate, int $perPage, int $page): string
     {
-        return self::CACHE_KEY_FILTERED . md5($status . $dueDate);
+        return self::CACHE_KEY_FILTERED . ":{$status}:{$dueDate}:{$perPage}:{$page}";
     }
 
     private function forgetCache(int $id): void

@@ -6,7 +6,6 @@ namespace App\Repositories\Interfaces;
 
 use App\DTOs\TaskData;
 use App\Models\Task;
-use Illuminate\Database\Eloquent\Collection;
 
 interface TaskRepositoryInterface
 {
@@ -14,5 +13,5 @@ interface TaskRepositoryInterface
     public function create(TaskData $data): Task;
     public function update(Task $task, TaskData $data): Task;
     public function delete(Task $task): void;
-    public function getFiltered(?string $status = null, ?string $dueDate = null): Collection;
+    public function getFiltered(?string $status = null, ?string $dueDate = null, int $perPage = 15, int $page = 1): \Illuminate\Pagination\LengthAwarePaginator;
 } 

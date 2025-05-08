@@ -37,8 +37,8 @@ class TaskService
         return $this->taskRepository->find($taskId);
     }
 
-    public function getFilteredTasks(?string $status = null, ?string $dueDate = null): Collection
+    public function getFilteredTasks(?string $status = null, ?string $dueDate = null, int $perPage = 15, int $page = 1): \Illuminate\Pagination\LengthAwarePaginator
     {
-        return $this->taskRepository->getFiltered($status, $dueDate);
+        return $this->taskRepository->getFiltered($status, $dueDate, $perPage, $page);
     }
 } 
