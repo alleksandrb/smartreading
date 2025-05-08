@@ -1,4 +1,4 @@
-.PHONY: build up down restart logs ps shell composer-install composer-update artisan-migrate artisan-seed artisan-cache-clear
+.PHONY: build up down restart logs ps shell composer-install composer-update artisan-migrate artisan-seed artisan-cache-clear artisan-key-generate
 
 # Build the Docker image
 build:
@@ -48,6 +48,10 @@ artisan-seed:
 artisan-cache-clear:
 	docker-compose exec app php artisan cache:clear
 
+# Generate Laravel application key
+artisan-key-generate:
+	docker-compose exec app php artisan key:generate
+
 # Help command
 help:
 	@echo "Available commands:"
@@ -62,4 +66,5 @@ help:
 	@echo "  make composer-update    - Update Composer dependencies"
 	@echo "  make artisan-migrate    - Run database migrations"
 	@echo "  make artisan-seed       - Run database seeders"
-	@echo "  make artisan-cache-clear - Clear Laravel cache" 
+	@echo "  make artisan-cache-clear - Clear Laravel cache"
+	@echo "  make artisan-key-generate - Generate Laravel application key" 
