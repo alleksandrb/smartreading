@@ -8,7 +8,9 @@ use App\DTOs\TaskData;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Task\StoreRequest;
 use App\Http\Requests\Task\UpdateRequest;
+use App\Http\Requests\Task\IndexRequest;
 use App\Http\Resources\TaskResource;
+use App\Http\Resources\TaskCollection;
 use App\Services\TaskService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
@@ -22,14 +24,16 @@ class TaskController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(): JsonResponse
+    public function index(IndexRequest $request): JsonResponse
     {
         $tasks = $this->taskService->getFilteredTasks(
-            status: request('status'),
-            dueDate: request('due_date')
+            status: $request->input('status'),
+            dueDate: $request->input('due_date'),
+            perPage: $request->input('per_page', 15),
+            page: $request->input('page', 1)
         );
 
-        return TaskResource::collection($tasks)
+        return (new TaskCollection($tasks))
             ->response()
             ->setStatusCode(Response::HTTP_OK);
     }
