@@ -52,19 +52,33 @@ class TaskRepository implements TaskRepositoryInterface
     {
         $cacheKey = $this->getFilteredCacheKey($status, $dueDate, $perPage, $page);
 
-        return Cache::remember(
-            $cacheKey,
-            self::CACHE_TTL,
-            fn () => Task::query()
-                ->when($status !== null, function (Builder $query) use ($status) {
-                    $query->where('status', $status);
-                })
-                ->when($dueDate !== null, function (Builder $query) use ($dueDate) {
-                    $query->whereDate('due_date', $dueDate);
-                })
-                ->with('user')
-                ->paginate($perPage, ['*'], 'page', $page)
-        );
+        try {
+            return Cache::tags([self::CACHE_KEY_FILTERED])->remember(
+                $cacheKey,
+                self::CACHE_TTL,
+                fn () => $this->getFilteredQuery($status, $dueDate, $perPage, $page)
+            );
+        } catch (\BadMethodCallException $e) {
+            // Fallback to regular cache if tags are not supported
+            return Cache::remember(
+                $cacheKey,
+                self::CACHE_TTL,
+                fn () => $this->getFilteredQuery($status, $dueDate, $perPage, $page)
+            );
+        }
+    }
+
+    private function getFilteredQuery(?string $status, ?string $dueDate, int $perPage, int $page)
+    {
+        return Task::query()
+            ->when($status !== null, function (Builder $query) use ($status) {
+                $query->where('status', $status);
+            })
+            ->when($dueDate !== null, function (Builder $query) use ($dueDate) {
+                $query->whereDate('due_date', $dueDate);
+            })
+            ->with('user')
+            ->paginate($perPage, ['*'], 'page', $page);
     }
 
     private function getCacheKey(int $id): string
@@ -84,6 +98,11 @@ class TaskRepository implements TaskRepositoryInterface
 
     private function forgetFilteredCache(): void
     {
-        Cache::forget(self::CACHE_KEY_FILTERED . '*');
+        try {
+            Cache::tags([self::CACHE_KEY_FILTERED])->flush();
+        } catch (\BadMethodCallException $e) {
+            // If tags are not supported, we'll clear all cache
+            Cache::flush();
+        }
     }
 }
