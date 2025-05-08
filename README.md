@@ -18,24 +18,20 @@ cd smartreading
 cp .env.example .env
 ```
 
-3. Сгенерируйте ключ приложения Laravel:
-```bash
-make artisan-key-generate
-```
-
-4. Соберите и запустите контейнеры:
+3. Соберите и запустите контейнеры:
 ```bash
 make build
 make up
 ```
 
-5. Установите зависимости:
+4. Установите зависимости:
 ```bash
 make composer-install
 ```
 
-6. Запустите миграции и сидеры базы данных:
+5. Запустите миграции и сидеры базы данных и сгенерируйте ключ приложения Laravel:
 ```bash
+make artisan-key-generate
 make artisan-migrate
 make artisan-seed
 ```
