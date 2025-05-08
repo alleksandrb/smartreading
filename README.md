@@ -85,7 +85,7 @@ Content-Type: application/json
 
 ### Получение списка всех задач
 ```bash
-GET /api/tasks?due_date=2026-03-20&status=new
+GET /api/tasks?due_date=2026-03-20&status=new&per_page=15&page=1
 Authorization: Bearer <ваш_токен_доступа>
 ```
 
